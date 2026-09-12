@@ -9,62 +9,132 @@
     <!-- Base-path resolver for GitHub Pages & subpath hosting -->
     <script>
       (function() {
-        const path = window.location.pathname;
-        const base = path.endsWith('/') ? path : path.substring(0, path.lastIndexOf('/') + 1);
-        if (base && base !== '/') {
-          const origin = window.location.origin;
-          const originAssets = origin + '/assets/';
-          const correctedAssets = origin + base + 'assets/';
-
-          const origFetch = window.fetch;
-          window.fetch = function(input, init) {
-            if (typeof input === 'string') {
-              if (input.startsWith(originAssets)) {
-                input = correctedAssets + input.slice(originAssets.length);
-              } else if (input.startsWith('/assets/')) {
-                input = base + input.slice(1);
-              }
-            } else if (input instanceof Request && input.url && input.url.startsWith(originAssets)) {
-              const newUrl = correctedAssets + input.url.slice(originAssets.length);
-              input = new Request(newUrl, input);
-            }
-            return origFetch.call(this, input, init);
-          };
-
-          const OrigWorker = window.Worker;
-          window.Worker = function(scriptURL, options) {
-            if (typeof scriptURL === 'string') {
-              if (scriptURL.startsWith(originAssets)) {
-                scriptURL = correctedAssets + scriptURL.slice(originAssets.length);
-              } else if (scriptURL.startsWith('/assets/')) {
-                scriptURL = base + scriptURL.slice(1);
-              }
-            } else if (scriptURL instanceof URL && scriptURL.href.startsWith(originAssets)) {
-              scriptURL = new URL(correctedAssets + scriptURL.href.slice(originAssets.length));
-            }
-            return new OrigWorker(scriptURL, options);
-          };
-
-          if (window.AudioContext && window.AudioWorklet && AudioWorklet.prototype.addModule) {
-            const origAddModule = AudioWorklet.prototype.addModule;
-            AudioWorklet.prototype.addModule = function(moduleURL, options) {
-              if (typeof moduleURL === 'string') {
-                if (moduleURL.startsWith(originAssets)) {
-                  moduleURL = correctedAssets + moduleURL.slice(originAssets.length);
-                } else if (moduleURL.startsWith('/assets/')) {
-                  moduleURL = base + moduleURL.slice(1);
-                }
-              }
-              return origAddModule.call(this, moduleURL, options);
-            };
-          }
-
-          window.addEventListener('error', function(e) {
-            if (e.target && e.target.tagName === 'IMG' && e.target.src && e.target.src.startsWith(originAssets)) {
-              e.target.src = correctedAssets + e.target.src.slice(originAssets.length);
-            }
-          }, true);
+        var loc = window.location;
+        // 1. Enforce trailing slash on subpath URLs immediately before anything else loads
+        if (!loc.pathname.endsWith('/') && !loc.pathname.split('/').pop().includes('.')) {
+          loc.replace(loc.pathname + '/' + loc.search + loc.hash);
+          return;
         }
+
+        // 2. Determine repo base or current subpath
+        var path = loc.pathname;
+        var segs = path.split('/').filter(Boolean);
+        var isGithub = loc.hostname.endsWith('github.io');
+        var repoName = (isGithub && segs.length > 0) ? segs[0] : '';
+        var basePath = repoName ? ('/' + repoName + '/') : (path.endsWith('/') ? path : path.substring(0, path.lastIndexOf('/') + 1));
+        if (!basePath.endsWith('/')) basePath += '/';
+
+        var origin = loc.origin;
+        var fullBase = origin + basePath;
+        var fullAssets = fullBase + 'assets/';
+        var badAssets = origin + '/assets/';
+
+        // 3. Inject <base> tag dynamically
+        if (basePath !== '/') {
+          var baseEl = document.querySelector('base') || document.createElement('base');
+          baseEl.href = fullBase;
+          if (!baseEl.parentNode && document.head) {
+            document.head.insertBefore(baseEl, document.head.firstChild);
+          }
+        }
+
+        // 4. Robust URL fixer
+        function fixUrl(url) {
+          if (!url || typeof url !== 'string') return url;
+
+          if (url.startsWith(badAssets)) {
+            return fullAssets + url.slice(badAssets.length);
+          }
+          if (url.startsWith('/assets/')) {
+            return fullAssets + url.slice(8);
+          }
+          if (url.startsWith('./assets/')) {
+            return fullAssets + url.slice(9);
+          }
+          if (url.startsWith('assets/')) {
+            return fullAssets + url.slice(7);
+          }
+          if (repoName && url.startsWith(origin + '/') && !url.startsWith(fullBase)) {
+            return fullBase + url.slice(origin.length + 1);
+          }
+          if (repoName && url.startsWith('/') && !url.startsWith(basePath)) {
+            return basePath + url.slice(1);
+          }
+          return url;
+        }
+
+        // 5. Intercept window.fetch
+        var origFetch = window.fetch;
+        window.fetch = function(input, init) {
+          if (typeof input === 'string') {
+            input = fixUrl(input);
+          } else if (input instanceof Request && input.url) {
+            var fixed = fixUrl(input.url);
+            if (fixed !== input.url) {
+              input = new Request(fixed, input);
+            }
+          }
+          return origFetch.call(this, input, init);
+        };
+
+        // 6. Intercept XMLHttpRequest
+        var origOpen = XMLHttpRequest.prototype.open;
+        XMLHttpRequest.prototype.open = function(method, url) {
+          if (typeof url === 'string') {
+            url = fixUrl(url);
+          }
+          return origOpen.apply(this, [method, url].concat(Array.prototype.slice.call(arguments, 2)));
+        };
+
+        // 7. Intercept window.Worker
+        var OrigWorker = window.Worker;
+        window.Worker = function(scriptURL, options) {
+          if (typeof scriptURL === 'string') {
+            scriptURL = fixUrl(scriptURL);
+          } else if (scriptURL instanceof URL) {
+            var fixedW = fixUrl(scriptURL.href);
+            if (fixedW !== scriptURL.href) {
+              scriptURL = new URL(fixedW);
+            }
+          }
+          return new OrigWorker(scriptURL, options);
+        };
+
+        // 8. Intercept AudioWorklet.addModule
+        if (window.AudioContext && window.AudioWorklet && AudioWorklet.prototype.addModule) {
+          var origAddModule = AudioWorklet.prototype.addModule;
+          AudioWorklet.prototype.addModule = function(moduleURL, options) {
+            if (typeof moduleURL === 'string') {
+              moduleURL = fixUrl(moduleURL);
+            }
+            return origAddModule.call(this, moduleURL, options);
+          };
+        }
+
+        // 9. Intercept HTMLImageElement src property setter
+        var imgDesc = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
+        if (imgDesc && imgDesc.set) {
+          var origImgSet = imgDesc.set;
+          Object.defineProperty(HTMLImageElement.prototype, 'src', {
+            set: function(val) {
+              return origImgSet.call(this, fixUrl(val));
+            },
+            get: imgDesc.get,
+            configurable: true,
+            enumerable: true
+          });
+        }
+
+        // 10. Global error event listener for <img> tags
+        window.addEventListener('error', function(e) {
+          if (e.target && e.target.tagName === 'IMG' && e.target.src) {
+            var fixedImg = fixUrl(e.target.src);
+            if (fixedImg !== e.target.src && !e.target.dataset.fixed) {
+              e.target.dataset.fixed = '1';
+              e.target.src = fixedImg;
+            }
+          }
+        }, true);
       })();
     </script>
     <!-- Google Fonts: Taste-Skill Typography -->
