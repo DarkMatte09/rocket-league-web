@@ -9,12 +9,24 @@
   let connection = null;
   let isHost = false;
   let isGuest = false;
-  let roomCode = null;
+  let currentCleanCode = null;
   let remoteControls = { throttle: 0, steer: 0, pitch: 0, yaw: 0, roll: 0, jump: false, boost: false, handbrake: false };
   let ping = 0;
   let lastPingTime = 0;
   let stateSendInterval = null;
   let pingInterval = null;
+  let connectTimeout = null;
+
+  // Global ICE configuration with Google STUN + Cloudflare + OpenRelay TURN
+  const ICE_CONFIG = {
+    iceServers: [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' },
+      { urls: 'stun:stun.cloudflare.com:3478' },
+      { urls: 'turn:openrelay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
+      { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' }
+    ]
+  };
 
   // Quick Chat Messages
   const QUICK_CHATS = {
@@ -24,17 +36,28 @@
     4: '💥 Oops!'
   };
 
-  function generateRoomCode() {
+  function normalizeCode(raw) {
+    if (!raw) return '';
+    let clean = String(raw).toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (clean.startsWith('RL') && clean.length > 2) clean = clean.slice(2);
+    return clean;
+  }
+
+  function getDisplayCode(clean) {
+    return 'RL-' + clean;
+  }
+
+  function getPeerId(clean) {
+    return 'rlw-rl-' + clean.toLowerCase();
+  }
+
+  function generateRandomCleanCode() {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    let code = 'RL-';
+    let code = '';
     for (let i = 0; i < 4; i++) {
       code += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     return code;
-  }
-
-  function getPeerIdForRoom(code) {
-    return `rlw-room-${code.toUpperCase().trim()}`;
   }
 
   function showToast(title, subtitle, type = 'info') {
@@ -82,99 +105,139 @@
     }
   });
 
+  // Ensure Peer library is available
+  function ensurePeerLibrary(callback) {
+    if (typeof window.Peer !== 'undefined') {
+      callback();
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = './peerjs.min.js';
+    script.onload = () => callback();
+    script.onerror = () => {
+      updateLobbyUI('error', 'Impossibile caricare il motore WebRTC (peerjs). Ricarica la pagina.');
+    };
+    document.head.appendChild(script);
+  }
+
   // Create Private Room (Host)
   function createRoom() {
-    if (peer) peer.destroy();
+    ensurePeerLibrary(() => {
+      if (peer) {
+        try { peer.destroy(); } catch (e) {}
+      }
 
-    roomCode = generateRoomCode();
-    const peerId = getPeerIdForRoom(roomCode);
-    isHost = true;
-    isGuest = false;
+      currentCleanCode = generateRandomCleanCode();
+      const displayCode = getDisplayCode(currentCleanCode);
+      const peerId = getPeerId(currentCleanCode);
+      isHost = true;
+      isGuest = false;
 
-    updateLobbyUI('connecting', `Creazione stanza ${roomCode}...`);
+      updateLobbyUI('connecting', `Inizializzazione stanza ${displayCode}...`);
 
-    try {
-      peer = new window.Peer(peerId, {
-        debug: 1,
-        config: {
-          iceServers: [
-            { urls: 'stun:stun.l.google.com:19302' },
-            { urls: 'stun:stun1.l.google.com:19302' }
-          ]
-        }
-      });
+      try {
+        peer = new window.Peer(peerId, {
+          debug: 1,
+          config: ICE_CONFIG
+        });
 
-      peer.on('open', (id) => {
-        updateLobbyUI('waiting', roomCode);
-        showToast('Stanza Creata!', `Codice: ${roomCode}. Invia il link al tuo amico.`, 'success');
-      });
+        peer.on('open', (id) => {
+          updateLobbyUI('waiting', displayCode);
+          showToast('Stanza Creata!', `Codice: ${displayCode}. Invia il link o codice al tuo amico.`, 'success');
+        });
 
-      peer.on('connection', (conn) => {
-        connection = conn;
-        setupConnectionHandlers(conn);
-      });
+        peer.on('connection', (conn) => {
+          connection = conn;
+          setupConnectionHandlers(conn);
+        });
 
-      peer.on('error', (err) => {
-        console.warn('PeerJS Host Error:', err);
-        if (err.type === 'unavailable-id') {
-          // Retry with new code if collision
-          setTimeout(createRoom, 300);
-        } else {
-          updateLobbyUI('error', `Errore connessione: ${err.message || err.type}`);
-        }
-      });
-    } catch (e) {
-      updateLobbyUI('error', `Errore WebRTC: ${e.message}`);
-    }
+        peer.on('error', (err) => {
+          console.warn('PeerJS Host Error:', err);
+          if (err.type === 'unavailable-id') {
+            // ID conflict, retry with new code
+            setTimeout(createRoom, 200);
+          } else {
+            updateLobbyUI('error', `Errore connessione: ${err.message || err.type}`);
+          }
+        });
+      } catch (e) {
+        updateLobbyUI('error', `Errore WebRTC: ${e.message}`);
+      }
+    });
   }
 
   // Join Private Room (Guest)
-  function joinRoom(code) {
-    if (!code) return;
-    if (peer) peer.destroy();
-
-    roomCode = code.toUpperCase().trim();
-    const hostPeerId = getPeerIdForRoom(roomCode);
-    isHost = false;
-    isGuest = true;
-
-    updateLobbyUI('connecting', `Connessione alla stanza ${roomCode}...`);
-
-    try {
-      peer = new window.Peer({
-        debug: 1,
-        config: {
-          iceServers: [
-            { urls: 'stun:stun.l.google.com:19302' },
-            { urls: 'stun:stun1.l.google.com:19302' }
-          ]
-        }
-      });
-
-      peer.on('open', () => {
-        const conn = peer.connect(hostPeerId, {
-          reliable: false,
-          serialization: 'json'
-        });
-        connection = conn;
-        setupConnectionHandlers(conn);
-      });
-
-      peer.on('error', (err) => {
-        console.warn('PeerJS Guest Error:', err);
-        updateLobbyUI('error', `Impossibile trovare la stanza ${roomCode}. Verifica il codice.`);
-      });
-    } catch (e) {
-      updateLobbyUI('error', `Errore WebRTC: ${e.message}`);
+  function joinRoom(rawCode) {
+    const clean = normalizeCode(rawCode);
+    if (!clean) {
+      updateLobbyUI('error', 'Inserisci un codice stanza valido (es. RL-8492 o 8492).');
+      return;
     }
+
+    ensurePeerLibrary(() => {
+      if (peer) {
+        try { peer.destroy(); } catch (e) {}
+      }
+
+      currentCleanCode = clean;
+      const displayCode = getDisplayCode(clean);
+      const hostPeerId = getPeerId(clean);
+      isHost = false;
+      isGuest = true;
+
+      updateLobbyUI('connecting', `Connessione alla stanza ${displayCode}...`);
+
+      clearTimeout(connectTimeout);
+      connectTimeout = setTimeout(() => {
+        if (!connection || !connection.open) {
+          updateLobbyUI('error', `Timeout: impossibile connettersi alla stanza ${displayCode}. Verifica che l'Host abbia già creato la stanza e sia online.`);
+          if (connection) {
+            try { connection.close(); } catch (e) {}
+          }
+        }
+      }, 10000);
+
+      try {
+        peer = new window.Peer({
+          debug: 1,
+          config: ICE_CONFIG
+        });
+
+        peer.on('open', (myId) => {
+          updateLobbyUI('connecting', `Ricerca Host per la stanza ${displayCode}...`);
+          
+          // Connect to Host with standard reliable DataChannel
+          const conn = peer.connect(hostPeerId, {
+            reliable: true
+          });
+          connection = conn;
+          setupConnectionHandlers(conn);
+        });
+
+        peer.on('error', (err) => {
+          console.warn('PeerJS Guest Error:', err);
+          clearTimeout(connectTimeout);
+          if (err.type === 'peer-unavailable') {
+            updateLobbyUI('error', `Stanza ${displayCode} non trovata. L'Host deve prima cliccare "Crea Stanza Privata".`);
+          } else {
+            updateLobbyUI('error', `Errore connessione: ${err.message || err.type}`);
+          }
+        });
+      } catch (e) {
+        clearTimeout(connectTimeout);
+        updateLobbyUI('error', `Errore WebRTC: ${e.message}`);
+      }
+    });
   }
 
   function setupConnectionHandlers(conn) {
     conn.on('open', () => {
-      updateLobbyUI('connected', roomCode);
-      showToast('Amico Connesso!', 'La partita online 1v1 è pronta!', 'success');
+      clearTimeout(connectTimeout);
+      const displayCode = getDisplayCode(currentCleanCode);
+      updateLobbyUI('connected', displayCode);
+      showToast('Amico Connesso!', 'La partita online 1v1 è attiva!', 'success');
 
-      // Start ping loop
+      // Start ping heartbeat
       clearInterval(pingInterval);
       pingInterval = setInterval(() => {
         if (conn && conn.open) {
@@ -183,7 +246,7 @@
         }
       }, 1000);
 
-      // If Host, start match physics broadcasting
+      // Start role-specific loops
       if (isHost) {
         startHostMatch();
       } else {
@@ -196,12 +259,15 @@
     });
 
     conn.on('close', () => {
+      clearTimeout(connectTimeout);
       showToast('Disconnesso', 'L\'amico si è disconnesso dalla partita.', 'warning');
       cleanupMultiplayer();
     });
 
     conn.on('error', (err) => {
       console.warn('DataChannel Error:', err);
+      clearTimeout(connectTimeout);
+      updateLobbyUI('error', 'Errore DataChannel durante la connessione.');
     });
   }
 
@@ -216,7 +282,7 @@
     }
 
     if (data.type === 'pong') {
-      ping = Math.round(performance.now() - data.t);
+      ping = Math.max(1, Math.round(performance.now() - data.t));
       updatePingUI(ping);
       return;
     }
@@ -236,12 +302,6 @@
       // Host sending physics state to Guest
       applyHostStateToGuest(data);
       return;
-    }
-
-    if (data.type === 'match_event') {
-      if (data.event === 'start') {
-        showToast('Partita Iniziata!', 'Kickoff!', 'success');
-      }
     }
   }
 
@@ -270,15 +330,12 @@
       const state = sim.state;
       if (!state) return;
 
-      // Extract ball (indices in state: ball is typically at offset 0-18)
-      // and cars (car 0 and car 1)
       const snapshot = {
         type: 'state',
         scoreBlue: match ? match.state.blueScore : 0,
         scoreOrange: match ? match.state.orangeScore : 0,
         time: match ? match.state.remainingSeconds : 300,
         phase: match ? match.state.phase : 'playing',
-        // Raw state slice (first 100 floats contains ball, cars, etc.)
         simState: Array.from(state.subarray(0, 120))
       };
 
@@ -291,6 +348,10 @@
     const sceneManager = window.__rl_sceneManager;
     const matchUI = window.__rl_matchUI;
 
+    if (sim) {
+      // Configure arena with opponent for guest
+      sim.configureCars('default', true);
+    }
     if (matchUI) matchUI.hide();
 
     // Guest input sending loop (60Hz)
@@ -298,7 +359,6 @@
     stateSendInterval = setInterval(() => {
       if (!connection || !connection.open) return;
 
-      // Read local player controls
       const localControls = window.__rl_currentControls || {
         throttle: 0,
         steer: 0,
@@ -336,6 +396,7 @@
   }
 
   function cleanupMultiplayer() {
+    clearTimeout(connectTimeout);
     clearInterval(stateSendInterval);
     clearInterval(pingInterval);
     if (connection) {
@@ -348,7 +409,7 @@
     }
     isHost = false;
     isGuest = false;
-    roomCode = null;
+    currentCleanCode = null;
     remoteControls = { throttle: 0, steer: 0, pitch: 0, yaw: 0, roll: 0, jump: false, boost: false, handbrake: false };
     updateLobbyUI('idle');
     updatePingUI(0);
@@ -390,7 +451,7 @@
             </button>
 
             <div class="mp-join-wrap">
-              <input type="text" id="input-room-code" class="mp-input" placeholder="Codice (es. RL-8492)" maxlength="8" />
+              <input type="text" id="input-room-code" class="mp-input" placeholder="Codice (es. RL-8492 o 8492)" maxlength="10" />
               <button type="button" id="btn-join-room" class="mp-btn mp-btn--secondary">
                 <span>Partecipa</span>
               </button>
@@ -484,7 +545,7 @@
       const inviteUrl = `${window.location.origin}${window.location.pathname}?room=${extra}`;
       statusArea.innerHTML = `
         <div class="mp-room-badge">
-          <div class="mp-room-title">STANZA PRIVATA CREATA</div>
+          <div class="mp-room-title">STANZA PRIVATA ATTIVA</div>
           <div class="mp-room-code">${extra}</div>
           <div class="mp-room-copy-wrap">
             <button type="button" id="btn-copy-link" class="mp-copy-btn">
@@ -492,7 +553,7 @@
             </button>
           </div>
           <div class="mp-waiting-pulse">
-            <span class="radar-dot"></span> In attesa che l'amico entri con il codice o link...
+            <span class="radar-dot"></span> In attesa che l'amico entri con codice o link...
           </div>
         </div>
       `;
@@ -508,14 +569,15 @@
     } else if (state === 'connected') {
       statusArea.innerHTML = `
         <div class="mp-connected-state">
-          <div class="mp-connected-badge">🟢 PARTITA 1v1 CONNESSA!</div>
-          <div class="mp-connected-sub">Stanza: <strong>${extra}</strong> | Latenza WebRTC attiva</div>
+          <div class="mp-connected-badge">🟢 PARTITA ONLINE ATTIVA!</div>
+          <div class="mp-connected-sub">Stanza: <strong>${extra}</strong> | Connessione WebRTC P2P Diretta</div>
         </div>
       `;
     } else if (state === 'error') {
       statusArea.innerHTML = `
         <div class="mp-error-state">
-          <span>⚠️ ${extra}</span>
+          <span>${extra}</span>
+          <button type="button" class="mp-retry-btn" onclick="window.__rl_multiplayer && window.__rl_multiplayer.cleanup()">Ricarica Lobby</button>
         </div>
       `;
     } else {
