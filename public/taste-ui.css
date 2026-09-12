@@ -1,0 +1,1844 @@
+/* ==========================================================================
+   ROCKET LEAGUE WEB — TASTE-SKILL DESIGN SYSTEM
+   Theme: Aerospace Dark-Tech & Esport Liquid Glass
+   Variables, Liquid Glass Materials, Slanted Chamfers, and Overlap-Free Layout
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,500;0,600;0,700;1,600;1,700&family=JetBrains+Mono:wght@400;600;700&family=Rajdhani:wght@500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+:root {
+  --font-display: 'Rajdhani', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-esport: 'Chakra Petch', sans-serif;
+  --font-body: 'Space Grotesk', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Color Palette - Anti-Slop, High-Contrast Precision */
+  --bg-deep: #03060e;
+  --glass-bg: rgba(9, 14, 26, 0.82);
+  --glass-bg-hover: rgba(16, 24, 46, 0.92);
+  --glass-border: rgba(255, 255, 255, 0.14);
+  --glass-border-hover: rgba(255, 255, 255, 0.28);
+  --glass-highlight: rgba(255, 255, 255, 0.24);
+
+  --cyan-primary: #00f0ff;
+  --cyan-glow: rgba(0, 240, 255, 0.35);
+  --orange-boost: #ff5500;
+  --orange-boost-bright: #ff7700;
+  --orange-glow: rgba(255, 85, 0, 0.45);
+  --gold-speed: #ffd000;
+  --gold-glow: rgba(255, 208, 0, 0.4);
+  --supersonic-magenta: #ff0077;
+
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-dim: #475569;
+
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Base resets & typography */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg-deep);
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   LIQUID GLASS MIXIN UTILITY
+   ========================================================================== */
+.liquid-dock {
+  position: relative;
+  isolation: isolate;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.02) 100%),
+    var(--glass-bg);
+  backdrop-filter: blur(24px) saturate(190%) contrast(1.05);
+  -webkit-backdrop-filter: blur(24px) saturate(190%) contrast(1.05);
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    inset 0 1px 0 var(--glass-highlight),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+    0 16px 36px rgba(0, 0, 0, 0.55);
+  border-radius: 12px;
+  transition: all 0.25s var(--ease-spring);
+}
+
+/* ==========================================================================
+   TOP TELEMETRY & ESPORTS STATUS BAR
+   ========================================================================== */
+#rl-top-hud {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  right: 200px; /* Generous breathing room from Fullscreen and Settings tools */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+  z-index: 100;
+  gap: 16px;
+}
+
+#rl-top-hud * {
+  pointer-events: auto;
+}
+
+/* Speedometer & Car Telemetry Left */
+.telemetry-speed-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 18px;
+  min-width: 280px;
+}
+
+.telemetry-divider {
+  width: 1px;
+  height: 32px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.18) 50%, rgba(255, 255, 255, 0.04) 100%);
+  margin: 0 4px;
+}
+
+.fps-numbers {
+  display: flex;
+  flex-direction: column;
+}
+
+.fps-val-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.fps-value {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+  letter-spacing: 0.02em;
+  font-feature-settings: 'tnum';
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 14px rgba(0, 240, 255, 0.25);
+  transition: color 0.2s ease;
+}
+
+.fps-unit {
+  font-family: var(--font-esport);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+  font-style: italic;
+}
+
+.fps-status-sub {
+  font-family: var(--font-esport);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--cyan-primary);
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.fps-status-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--cyan-primary);
+  box-shadow: 0 0 6px var(--cyan-primary);
+}
+
+.speed-dial-wrap {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.speed-svg-ring {
+  width: 44px;
+  height: 44px;
+  transform: rotate(-90deg);
+}
+
+.speed-ring-bg {
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 3.5;
+}
+
+.speed-ring-bar {
+  stroke: var(--cyan-primary);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.1s linear, stroke 0.2s ease;
+  filter: drop-shadow(0 0 6px var(--cyan-glow));
+}
+
+.speed-icon-center {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  fill: var(--text-primary);
+  opacity: 0.85;
+}
+
+.speed-numbers {
+  display: flex;
+  flex-direction: column;
+}
+
+.speed-val-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.speed-value {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+  letter-spacing: 0.02em;
+  font-feature-settings: 'tnum';
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 16px rgba(0, 240, 255, 0.3);
+}
+
+.speed-unit {
+  font-family: var(--font-esport);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+  font-style: italic;
+}
+
+.speed-status-sub {
+  font-family: var(--font-esport);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--cyan-primary);
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.speed-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cyan-primary);
+  box-shadow: 0 0 8px var(--cyan-primary);
+  animation: pulse-dot 1.8s infinite;
+}
+
+/* Supersonic state highlight */
+.is-supersonic .speed-ring-bar {
+  stroke: var(--orange-boost-bright);
+  filter: drop-shadow(0 0 8px var(--orange-glow));
+}
+
+.is-supersonic .speed-value {
+  color: #fff;
+  text-shadow: 0 0 20px var(--orange-glow);
+}
+
+.is-supersonic .speed-status-sub {
+  color: var(--orange-boost-bright);
+}
+
+.is-supersonic .speed-status-dot {
+  background: var(--orange-boost-bright);
+  box-shadow: 0 0 10px var(--orange-boost-bright);
+}
+
+/* Center Training Actions Toolbar */
+.training-dock {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+}
+
+.training-title-badge {
+  font-family: var(--font-esport);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  padding-right: 8px;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.training-pill-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  padding: 6px 12px;
+  font-family: var(--font-esport);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s var(--ease-spring);
+}
+
+.training-pill-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.24);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+
+.training-pill-btn:active {
+  transform: translateY(1px);
+}
+
+.key-glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* Right Status / Gamepad Dock */
+.system-dock {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: 32px;
+}
+
+.pad-status-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  font-family: var(--font-esport);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.pad-status-badge.connected {
+  color: var(--cyan-primary);
+  border-color: rgba(0, 240, 255, 0.28);
+  background: rgba(0, 240, 255, 0.06);
+}
+
+.pad-icon {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+/* ==========================================================================
+   ARENA / STADIUM SELECTOR DOCK & MODAL STYLES
+   ========================================================================== */
+.arena-dock {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%),
+    rgba(9, 14, 26, 0.88);
+  border: 1px solid rgba(0, 240, 255, 0.28);
+  border-radius: 999px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.arena-dock:hover {
+  border-color: rgba(0, 240, 255, 0.6);
+  box-shadow: 0 8px 32px rgba(0, 240, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.arena-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cyan-primary);
+  filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.7));
+}
+
+.arena-content-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.arena-tag {
+  font-family: var(--font-esport);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--cyan-primary);
+  text-transform: uppercase;
+  padding-right: 6px;
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.arena-dropdown {
+  background: transparent;
+  color: #ffffff;
+  border: none;
+  font-family: var(--font-esport);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  outline: none;
+  cursor: pointer;
+  padding-right: 16px;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2300f0ff' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right center;
+}
+
+.arena-dropdown option {
+  background: #080d1a;
+  color: #ffffff;
+  font-weight: 600;
+  padding: 8px 12px;
+}
+
+.arena-sheet-select {
+  background: rgba(10, 16, 32, 0.9) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(0, 240, 255, 0.35) !important;
+  border-radius: 8px !important;
+  padding: 8px 16px !important;
+  font-family: var(--font-esport) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  outline: none !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+  transition: all 0.2s ease !important;
+}
+
+.arena-sheet-select:hover,
+.arena-sheet-select:focus {
+  border-color: var(--cyan-primary) !important;
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.35) !important;
+}
+
+.arena-sheet-select option {
+  background: #080d1a;
+  color: #ffffff;
+  padding: 10px;
+}
+
+/* ==========================================================================
+   BOTTOM-LEFT STACK: BALL CAM (BOTTOM) + GARAGE (ABOVE) — ZERO OVERLAP
+   ========================================================================== */
+#app .ball-cam-indicator {
+  position: fixed !important;
+  bottom: 24px !important;
+  left: 24px !important;
+  margin: 0 !important;
+  height: 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 0 18px !important;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.02) 100%),
+    rgba(9, 14, 26, 0.88) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(0, 240, 255, 0.4) !important;
+  border-radius: 999px !important;
+  font-family: var(--font-esport) !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  font-style: italic !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: #fff !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    0 0 20px rgba(0, 240, 255, 0.25),
+    0 8px 24px rgba(0, 0, 0, 0.5) !important;
+  z-index: 95 !important;
+  transform: skewX(-6deg) !important;
+  transition: all 0.2s var(--ease-spring) !important;
+}
+
+#app .ball-cam-indicator::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--cyan-primary);
+  box-shadow: 0 0 10px var(--cyan-primary);
+  animation: pulse-dot 1.2s infinite;
+}
+
+#app .ball-cam-indicator.is-car-cam {
+  border-color: rgba(255, 255, 255, 0.14) !important;
+  color: var(--text-secondary) !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4) !important;
+}
+
+#app .ball-cam-indicator.is-car-cam::before {
+  background: var(--text-muted);
+  box-shadow: none;
+  animation: none;
+}
+
+/* Garage Button STACKED 14px DIRECTLY ABOVE Ball Cam */
+#app .car-tab {
+  position: fixed !important;
+  bottom: 76px !important; /* Cleanly above Ball Cam (24px + 40px + 12px) */
+  left: 24px !important;
+  top: auto !important;
+  right: auto !important;
+  width: auto !important;
+  min-width: 140px !important;
+  height: 44px !important;
+  padding: 8px 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%),
+    rgba(10, 15, 28, 0.88) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-radius: 12px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 10px 24px rgba(0, 0, 0, 0.5) !important;
+  color: #fff !important;
+  font-family: var(--font-esport) !important;
+  font-style: italic !important;
+  z-index: 95 !important;
+  transform: skewX(-6deg) !important;
+  transition: all 0.22s var(--ease-spring) !important;
+}
+
+#app .car-tab:hover {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.04) 100%),
+    rgba(16, 24, 48, 0.95) !important;
+  border-color: var(--cyan-primary) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 0 20px var(--cyan-glow),
+    0 12px 30px rgba(0, 0, 0, 0.55) !important;
+  transform: skewX(-6deg) translateY(-2px) !important;
+}
+
+#app .car-tab__label {
+  font-family: var(--font-esport);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+#app .car-tab__ride {
+  display: block !important;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--cyan-primary);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-top: 1px;
+}
+
+/* ==========================================================================
+   BOTTOM-RIGHT STACK: BOOST GAUGE (BOTTOM) + MATCH TAB (ABOVE) — ZERO OVERLAP
+   ========================================================================== */
+#app .boost {
+  position: fixed !important;
+  bottom: 24px !important;
+  right: 24px !important;
+  top: auto !important;
+  left: auto !important;
+  width: auto !important;
+  min-width: 180px !important;
+  height: 64px !important;
+  padding: 10px 22px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.02) 100%),
+    rgba(9, 14, 26, 0.88) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  border: 1px solid rgba(255, 85, 0, 0.45) !important;
+  border-radius: 16px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 0 28px rgba(255, 85, 0, 0.25),
+    0 16px 40px rgba(0, 0, 0, 0.6) !important;
+  transform: skewX(-6deg) !important;
+  z-index: 95 !important;
+  transition: all 0.2s var(--ease-spring) !important;
+}
+
+#app .boost__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#app .boost__label {
+  font-family: var(--font-esport);
+  font-size: 14px;
+  font-weight: 700;
+  font-style: italic;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#app .boost__label svg {
+  fill: var(--orange-boost);
+  filter: drop-shadow(0 0 6px var(--orange-boost));
+}
+
+#app .boost__value {
+  font-family: var(--font-display);
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+  letter-spacing: -0.02em;
+  text-shadow: 0 0 20px var(--orange-glow);
+  font-feature-settings: 'tnum';
+  font-variant-numeric: tabular-nums;
+  margin-left: auto;
+}
+
+#app .boost__meter {
+  display: none !important;
+}
+
+#app .boost.is-boosting {
+  border-color: var(--orange-boost-bright) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 0 36px var(--orange-glow),
+    0 16px 40px rgba(0, 0, 0, 0.7) !important;
+  transform: skewX(-6deg) scale(1.04) !important;
+}
+
+/* Match Tab (Play 1v1) STACKED 14px DIRECTLY ABOVE Boost */
+#app .match-tab {
+  position: fixed !important;
+  bottom: 102px !important; /* Cleanly above Boost (24px + 64px + 14px) */
+  right: 24px !important;
+  top: auto !important;
+  left: auto !important;
+  width: auto !important;
+  min-width: 180px !important;
+  height: 44px !important;
+  padding: 8px 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  background:
+    linear-gradient(135deg, rgba(255, 85, 0, 0.16) 0%, rgba(255, 85, 0, 0.04) 100%),
+    rgba(10, 15, 28, 0.88) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 85, 0, 0.4) !important;
+  border-radius: 12px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 10px 24px rgba(0, 0, 0, 0.5) !important;
+  color: #fff !important;
+  font-family: var(--font-esport) !important;
+  font-style: italic !important;
+  z-index: 95 !important;
+  transform: skewX(-6deg) !important;
+  transition: all 0.22s var(--ease-spring) !important;
+}
+
+#app .match-tab:hover {
+  background:
+    linear-gradient(135deg, rgba(255, 85, 0, 0.3) 0%, rgba(255, 85, 0, 0.08) 100%),
+    rgba(20, 24, 40, 0.95) !important;
+  border-color: var(--orange-boost) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 0 24px var(--orange-glow),
+    0 12px 30px rgba(0, 0, 0, 0.55) !important;
+  transform: skewX(-6deg) translateY(-2px) !important;
+}
+
+#app .match-tab__label {
+  font-family: var(--font-esport);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+#app .match-tab__mode {
+  display: block !important;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--orange-boost-bright);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-left: 4px;
+}
+
+/* ==========================================================================
+   TOP RIGHT TOOLS (SETTINGS & FULLSCREEN)
+   ========================================================================== */
+#app .hud-tools {
+  top: 16px !important;
+  right: 16px !important;
+  gap: 8px !important;
+  z-index: 102 !important;
+}
+
+#app .hud-tool {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.02) 100%),
+    rgba(10, 15, 28, 0.85) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: 10px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 8px 20px rgba(0, 0, 0, 0.4) !important;
+  transition: all 0.2s var(--ease-spring) !important;
+}
+
+#app .hud-tool:hover {
+  background: rgba(255, 255, 255, 0.16) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  transform: translateY(-2px) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 12px 28px rgba(0, 0, 0, 0.5) !important;
+}
+
+#app .hud-tool svg {
+  fill: #fff !important;
+  opacity: 0.9;
+}
+
+/* ==========================================================================
+   AAA LOADING SCREEN OVERHAUL (CINEMATIC ESPORTS SPLASH)
+   ========================================================================== */
+#loading {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(ellipse at 50% 35%, rgba(0, 240, 255, 0.12) 0%, rgba(255, 85, 0, 0.06) 45%, rgba(3, 6, 14, 0.98) 80%),
+    var(--bg-deep) !important;
+  color: #fff;
+  text-align: center;
+  padding: 24px;
+  user-select: none;
+  overflow: hidden;
+}
+
+/* Ambient dynamic light glow */
+.load__glow {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(0, 240, 255, 0.18) 0%, rgba(255, 85, 0, 0.08) 50%, transparent 70%);
+  filter: blur(60px);
+  pointer-events: none;
+  animation: glow-pulse 4s ease-in-out infinite alternate;
+}
+
+/* Floating Emblem */
+.load__emblem {
+  position: relative;
+  width: 100px !important;
+  height: 100px !important;
+  margin-bottom: 20px !important;
+  border-radius: 24px !important;
+  overflow: hidden;
+  background: rgba(10, 16, 32, 0.8) !important;
+  border: 1px solid rgba(0, 240, 255, 0.45) !important;
+  box-shadow:
+    0 0 32px rgba(0, 240, 255, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+  transform: none !important;
+  animation: float-emblem 3s ease-in-out infinite alternate;
+}
+
+.load__emblem img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Typography */
+.load__header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.load__title {
+  font-family: var(--font-display) !important;
+  font-size: clamp(44px, 7vw, 76px) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  line-height: 1 !important;
+  margin: 0 !important;
+  color: #fff !important;
+  text-shadow: 0 0 32px rgba(0, 240, 255, 0.35) !important;
+  -webkit-text-stroke: 0 !important;
+  transform: none !important;
+}
+
+.load__title span {
+  color: var(--orange-boost) !important;
+  text-shadow: 0 0 32px var(--orange-glow) !important;
+}
+
+.load__subtitle {
+  font-family: var(--font-esport);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-top: 6px;
+}
+
+/* Status & Progress Bar */
+.load__status-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 28px;
+}
+
+#loading .load__label {
+  font-family: var(--font-body) !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: var(--text-secondary) !important;
+  letter-spacing: 0.02em !important;
+  margin: 0 0 12px 0 !important;
+}
+
+#loading .load__rule {
+  width: min(320px, 80vw) !important;
+  height: 4px !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: none !important;
+  overflow: hidden !important;
+  position: relative !important;
+}
+
+#loading .load__rule:after {
+  content: "" !important;
+  display: block !important;
+  width: 50% !important;
+  height: 100% !important;
+  border-radius: 999px !important;
+  background: linear-gradient(90deg, transparent, var(--cyan-primary), var(--orange-boost), transparent) !important;
+  box-shadow: 0 0 12px var(--cyan-primary) !important;
+  animation: load-beam 1.4s ease-in-out infinite !important;
+}
+
+/* Pro Controls Dock on Loading Screen */
+.load__controls-dock {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  margin-top: 36px;
+  max-width: 680px;
+}
+
+.load__chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 8px;
+  font-family: var(--font-esport);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.load__k {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* ==========================================================================
+   MODAL DIALOGS (SETTINGS, GARAGE & PLAY 1V1 MATCH)
+   ========================================================================== */
+
+/* Hide background telemetry HUD when any modal is open for zero overlap */
+body:has(.sheet-overlay.is-open) #telemetry-hud,
+body:has(.sheet-overlay.is-open) #freeplay-macro-bar,
+body:has(.sheet-overlay.is-open) #rl-hud-controls,
+body:has(.car-overlay.is-open) #telemetry-hud,
+body:has(.car-overlay.is-open) #freeplay-macro-bar,
+body:has(.car-overlay.is-open) #rl-hud-controls,
+body:has(.match-overlay.is-open) #telemetry-hud,
+body:has(.match-overlay.is-open) #freeplay-macro-bar,
+body:has(.match-overlay.is-open) #rl-hud-controls {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.2s ease !important;
+}
+
+#app .sheet-overlay,
+#app .car-overlay,
+#app .match-overlay {
+  z-index: 500 !important;
+  background: rgba(2, 5, 12, 0.82) !important;
+  backdrop-filter: blur(24px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+  padding: 24px !important;
+}
+
+/* --------------------------------------------------------------------------
+   1. SETTINGS DIALOG (.sheet)
+   -------------------------------------------------------------------------- */
+#app .sheet {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%),
+    rgba(8, 14, 28, 0.96) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 16px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 28px 70px rgba(0, 0, 0, 0.85),
+    0 0 40px rgba(0, 240, 255, 0.08) !important;
+  color: #fff !important;
+  overflow: hidden !important;
+}
+
+#app .sheet-head {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0) 100%),
+    rgba(10, 18, 36, 0.95) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  padding: 18px 24px !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+#app .sheet-head h1 {
+  font-family: var(--font-esport) !important;
+  font-size: 28px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: #fff !important;
+  text-shadow: 0 0 20px rgba(0, 240, 255, 0.35) !important;
+}
+
+#app .sheet-head__ident > .ui-icon {
+  color: var(--cyan-primary) !important;
+  filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.5)) !important;
+}
+
+#app .sheet-head__close,
+#app .match-panel__close {
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+  background: rgba(255, 68, 85, 0.12) !important;
+  border: 1px solid rgba(255, 68, 85, 0.35) !important;
+  border-radius: 8px !important;
+  color: #ff6b7d !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+}
+
+#app .sheet-head__close:hover,
+#app .match-panel__close:hover {
+  background: rgba(255, 68, 85, 0.3) !important;
+  color: #fff !important;
+  border-color: rgba(255, 68, 85, 0.6) !important;
+  box-shadow: 0 0 18px rgba(255, 68, 85, 0.5) !important;
+  transform: translateY(-2px) !important;
+}
+
+#app .sheet-tabs {
+  background: rgba(5, 10, 20, 0.9) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  padding: 10px 18px 0 !important;
+  gap: 6px !important;
+}
+
+#app .sheet-tab {
+  background: rgba(255, 255, 255, 0.03) !important;
+  color: #8da4be !important;
+  font-family: var(--font-tech) !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  border: 1px solid transparent !important;
+  border-bottom: 2px solid transparent !important;
+  border-radius: 8px 8px 0 0 !important;
+  min-height: 58px !important;
+  padding: 8px 10px !important;
+  transition: all 0.18s ease !important;
+}
+
+#app .sheet-tab:hover {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.07) !important;
+}
+
+#app .sheet-tab.is-active,
+#app .sheet-tab[aria-selected="true"] {
+  background: linear-gradient(180deg, rgba(0, 240, 255, 0.16) 0%, rgba(0, 240, 255, 0.02) 100%) !important;
+  color: #00f0ff !important;
+  border-color: rgba(0, 240, 255, 0.3) rgba(0, 240, 255, 0.3) transparent !important;
+  border-bottom: 2px solid #00f0ff !important;
+  box-shadow: inset 0 1px 0 rgba(0, 240, 255, 0.4), 0 -4px 14px rgba(0, 240, 255, 0.15) !important;
+}
+
+#app .sheet-tab .ui-icon {
+  width: 20px !important;
+  height: 20px !important;
+  transition: transform 0.2s ease !important;
+}
+
+#app .sheet-tab.is-active .ui-icon {
+  color: #00f0ff !important;
+  filter: drop-shadow(0 0 6px rgba(0, 240, 255, 0.6)) !important;
+  transform: scale(1.08) !important;
+}
+
+#app .sheet-body {
+  background: rgba(6, 12, 24, 0.6) !important;
+  padding: 24px 28px !important;
+}
+
+#app .zone {
+  margin-bottom: 28px !important;
+}
+
+#app .zone__head {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  padding-bottom: 8px !important;
+  margin-bottom: 12px !important;
+}
+
+#app .zone__label {
+  font-family: var(--font-esport) !important;
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.05em !important;
+  color: #fff !important;
+  text-transform: uppercase !important;
+}
+
+#app .zone__note {
+  font-family: var(--font-tech) !important;
+  color: #7b93af !important;
+  font-size: 12px !important;
+}
+
+#app .dim {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-radius: 8px !important;
+  padding: 6px 12px !important;
+  margin-bottom: 6px !important;
+  transition: all 0.15s ease !important;
+}
+
+#app .dim:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+#app .dim__label {
+  font-family: var(--font-tech) !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  color: #dbe7f6 !important;
+}
+
+#app .dim__line {
+  height: 24px !important;
+}
+
+#app .dim__line::-webkit-slider-runnable-track {
+  height: 6px !important;
+  border: none !important;
+  border-radius: 3px !important;
+  background: linear-gradient(to right, #00f0ff 0%, #00a8ff var(--dim-progress), rgba(255, 255, 255, 0.1) var(--dim-progress), rgba(255, 255, 255, 0.1) 100%) !important;
+}
+
+#app .dim__line::-webkit-slider-thumb {
+  width: 18px !important;
+  height: 18px !important;
+  margin-top: -6px !important;
+  border-radius: 50% !important;
+  border: 2px solid #00f0ff !important;
+  background: #fff !important;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.6) !important;
+  cursor: pointer !important;
+  transition: transform 0.12s ease !important;
+}
+
+#app .dim__line::-webkit-slider-thumb:hover {
+  transform: scale(1.15) !important;
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.9) !important;
+}
+
+#app .dim__line::-moz-range-track {
+  height: 6px !important;
+  border: none !important;
+  border-radius: 3px !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+#app .dim__line::-moz-range-progress {
+  height: 6px !important;
+  border-radius: 3px !important;
+  background: linear-gradient(90deg, #00f0ff, #00a8ff) !important;
+}
+
+#app .dim__line::-moz-range-thumb {
+  width: 16px !important;
+  height: 16px !important;
+  border-radius: 50% !important;
+  border: 2px solid #00f0ff !important;
+  background: #fff !important;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.6) !important;
+}
+
+#app .figure {
+  background: rgba(0, 240, 255, 0.08) !important;
+  border: 1px solid rgba(0, 240, 255, 0.28) !important;
+  border-radius: 6px !important;
+  color: #00f0ff !important;
+  font-family: var(--font-mono) !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  padding: 4px 8px !important;
+  box-shadow: inset 0 1px 0 rgba(0, 240, 255, 0.15) !important;
+}
+
+#app .tick__mark {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 14px !important;
+  height: 24px !important;
+  width: 44px !important;
+}
+
+#app .tick__mark:after {
+  background: #fff !important;
+  width: 18px !important;
+  height: 18px !important;
+  border-radius: 50% !important;
+  top: 2px !important;
+  left: 3px !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+  transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+}
+
+#app .tick:checked + .tick__mark {
+  background: linear-gradient(90deg, #00f0ff, #0099ff) !important;
+  border-color: #00f0ff !important;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.4) !important;
+}
+
+#app .tick:checked + .tick__mark:after {
+  transform: translate(19px) !important;
+}
+
+#app .pick {
+  background: rgba(10, 18, 36, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 8px !important;
+  color: #fff !important;
+  font-family: var(--font-tech) !important;
+  font-size: 13px !important;
+  padding: 0 12px !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+
+#app .pick:focus {
+  border-color: #00f0ff !important;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.3) !important;
+}
+
+#app .parts thead th {
+  background: rgba(5, 10, 20, 0.9) !important;
+  color: #7b93af !important;
+  font-family: var(--font-tech) !important;
+  font-size: 11px !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  padding: 10px 12px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+#app .parts__group th {
+  font-family: var(--font-esport) !important;
+  color: var(--cyan-primary) !important;
+  font-size: 18px !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  padding-top: 20px !important;
+  border-bottom: 1px solid rgba(0, 240, 255, 0.2) !important;
+}
+
+#app .parts tbody tr:not(.parts__group):nth-child(2n) {
+  background: rgba(255, 255, 255, 0.02) !important;
+}
+
+#app .parts tbody tr:hover {
+  background: rgba(255, 255, 255, 0.04) !important;
+}
+
+#app .parts__name {
+  font-family: var(--font-tech) !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  color: #fff !important;
+}
+
+#app .parts__note {
+  font-family: var(--font-tech) !important;
+  font-size: 11px !important;
+  color: #7b93af !important;
+}
+
+#app .chip {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: 6px !important;
+  color: #e0edfc !important;
+  font-family: var(--font-mono) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+  transition: all 0.15s ease !important;
+}
+
+#app .chip-pair .chip {
+  border-radius: 6px 0 0 6px !important;
+}
+
+#app .chip:hover,
+#app .chip.is-capturing {
+  background: #00f0ff !important;
+  border-color: #00f0ff !important;
+  color: #040812 !important;
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.5) !important;
+}
+
+#app .chip__clear {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-left: 0 !important;
+  border-radius: 0 6px 6px 0 !important;
+  color: #7b93af !important;
+  transition: all 0.15s ease !important;
+}
+
+#app .chip__clear:hover {
+  background: rgba(255, 68, 85, 0.3) !important;
+  color: #fff !important;
+}
+
+#app .title-block {
+  background: rgba(5, 10, 20, 0.95) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  padding: 16px 24px !important;
+}
+
+#app .act {
+  height: 42px !important;
+  border-radius: 8px !important;
+  font-family: var(--font-esport) !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #d0e0f5 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  transition: all 0.18s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+}
+
+#app .act:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  color: #fff !important;
+  transform: translateY(-2px) !important;
+}
+
+#app .act--primary {
+  background: linear-gradient(135deg, #00f0ff 0%, #0088ff 100%) !important;
+  border: 1px solid rgba(0, 240, 255, 0.5) !important;
+  color: #020712 !important;
+  font-weight: 800 !important;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.35) !important;
+}
+
+#app .act--primary:hover {
+  background: linear-gradient(135deg, #33f3ff 0%, #1a94ff 100%) !important;
+  box-shadow: 0 0 28px rgba(0, 240, 255, 0.55) !important;
+}
+
+#app .sheet-handle {
+  background: rgba(10, 18, 36, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-left: 0 !important;
+  color: #00f0ff !important;
+  box-shadow: 4px 0 15px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* --------------------------------------------------------------------------
+   2. GARAGE DIALOG (.car-dialog)
+   -------------------------------------------------------------------------- */
+#app .car-dialog {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%),
+    rgba(8, 14, 28, 0.96) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 16px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 28px 70px rgba(0, 0, 0, 0.85),
+    0 0 40px rgba(0, 240, 255, 0.08) !important;
+  color: #fff !important;
+}
+
+#app .car-dialog__head {
+  padding: 24px 28px 18px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+#app .car-dialog__head h2 {
+  font-family: var(--font-esport) !important;
+  font-size: 38px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  color: #fff !important;
+  text-shadow: 0 0 25px rgba(0, 240, 255, 0.35) !important;
+}
+
+#app .car-dialog__subtitle {
+  font-family: var(--font-tech) !important;
+  color: #7b93af !important;
+  font-size: 13px !important;
+  letter-spacing: 0.04em !important;
+}
+
+#app .car-grid {
+  padding: 20px 28px !important;
+  gap: 20px !important;
+}
+
+#app .car-card {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%),
+    rgba(10, 18, 36, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+  overflow: hidden !important;
+  transition: all 0.22s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+}
+
+#app .car-card:hover {
+  transform: translateY(-6px) !important;
+  border-color: rgba(0, 240, 255, 0.4) !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 240, 255, 0.15) !important;
+}
+
+#app .car-card.is-selected {
+  border: 1.5px solid #00f0ff !important;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.6), 0 0 25px rgba(0, 240, 255, 0.25) !important;
+}
+
+#app .car-card__stage {
+  background: radial-gradient(ellipse at center, rgba(0, 240, 255, 0.14) 0%, rgba(8, 14, 28, 0.95) 75%) !important;
+}
+
+#app .car-card__stage:before {
+  background: rgba(0, 240, 255, 0.03) !important;
+}
+
+#app .car-card__stage:after {
+  border: 1px solid rgba(0, 240, 255, 0.35) !important;
+  background: rgba(0, 240, 255, 0.04) !important;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.2) !important;
+}
+
+#app .car-card__equipped {
+  background: #00f0ff !important;
+  color: #020712 !important;
+  border: none !important;
+  border-radius: 6px !important;
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.7) !important;
+}
+
+#app .car-card__body {
+  background: rgba(6, 12, 24, 0.85) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: none !important;
+  padding: 16px !important;
+  gap: 12px !important;
+}
+
+#app .car-card__name {
+  font-family: var(--font-esport) !important;
+  font-size: 22px !important;
+  font-weight: 800 !important;
+  color: #fff !important;
+  letter-spacing: 0.04em !important;
+  text-shadow: none !important;
+}
+
+#app .car-card__action {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+  color: #88a2c2 !important;
+  font-family: var(--font-tech) !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  min-height: 38px !important;
+  transition: all 0.18s ease !important;
+}
+
+#app .car-card:hover .car-card__action {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+#app .car-card.is-selected .car-card__action {
+  background: linear-gradient(135deg, #00f0ff 0%, #0088ff 100%) !important;
+  border-color: #00f0ff !important;
+  color: #020712 !important;
+  font-weight: 800 !important;
+  box-shadow: 0 0 18px rgba(0, 240, 255, 0.4) !important;
+}
+
+#app .car-dialog__foot {
+  padding: 12px 28px 20px !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
+  font-family: var(--font-tech) !important;
+  color: #7b93af !important;
+}
+
+#app .car-dialog__keys kbd {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: 4px !important;
+  color: #00f0ff !important;
+  font-family: var(--font-mono) !important;
+}
+
+/* --------------------------------------------------------------------------
+   3. PLAY / 1V1 MATCH DIALOG (.match-panel)
+   -------------------------------------------------------------------------- */
+#app .match-panel {
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%),
+    rgba(8, 14, 28, 0.96) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 16px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 28px 70px rgba(0, 0, 0, 0.85),
+    0 0 40px rgba(255, 140, 0, 0.08) !important;
+  color: #fff !important;
+}
+
+#app .match-panel__head {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0) 100%),
+    rgba(10, 18, 36, 0.95) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  padding: 18px 24px !important;
+}
+
+#app .match-panel__head h2 {
+  font-family: var(--font-esport) !important;
+  font-size: 32px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: #fff !important;
+  text-shadow: 0 0 25px rgba(255, 140, 0, 0.4) !important;
+}
+
+#app .match-panel__head p {
+  font-family: var(--font-tech) !important;
+  color: #7b93af !important;
+  font-size: 13px !important;
+  margin-top: 4px !important;
+}
+
+#app .match-panel__section-label {
+  font-family: var(--font-tech) !important;
+  font-weight: 800 !important;
+  font-size: 11px !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  color: #00f0ff !important;
+}
+
+#app .match-opponent {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%),
+    rgba(10, 18, 36, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+  overflow: hidden !important;
+}
+
+#app .match-opponent__faceoff {
+  height: 105px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+#app .match-opponent__player {
+  background: linear-gradient(135deg, #09204c 0%, #0d3880 100%) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+#app .match-opponent__bot {
+  background: linear-gradient(135deg, #441b06 0%, #702a06 100%) !important;
+}
+
+#app .match-opponent[data-player-team="orange"] .match-opponent__player {
+  background: linear-gradient(135deg, #441b06 0%, #702a06 100%) !important;
+}
+
+#app .match-opponent[data-player-team="orange"] .match-opponent__bot {
+  background: linear-gradient(135deg, #09204c 0%, #0d3880 100%) !important;
+}
+
+#app .match-opponent__player > span {
+  font-family: var(--font-esport) !important;
+  font-size: 24px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.06em !important;
+  color: #72d6ff !important;
+  text-shadow: 0 0 15px rgba(0, 240, 255, 0.5) !important;
+}
+
+#app .match-opponent__versus {
+  font-family: var(--font-esport) !important;
+  font-size: 36px !important;
+  font-weight: 900 !important;
+  color: #ff962e !important;
+  -webkit-text-stroke: 1.5px rgba(0, 0, 0, 0.8) !important;
+  text-shadow: 0 0 20px rgba(255, 140, 0, 0.8) !important;
+}
+
+#app .match-opponent__body {
+  padding: 16px 20px !important;
+}
+
+#app .match-opponent__type {
+  font-family: var(--font-tech) !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.1em !important;
+  color: #ff962e !important;
+}
+
+#app .match-opponent__name {
+  font-family: var(--font-esport) !important;
+  font-size: 26px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.05em !important;
+  color: #fff !important;
+  text-shadow: none !important;
+}
+
+#app .match-opponent__description {
+  font-family: var(--font-tech) !important;
+  color: #8da4be !important;
+  font-size: 12.5px !important;
+}
+
+#app .match-opponent__check {
+  background: #00f0ff !important;
+  color: #020712 !important;
+  border: none !important;
+  border-radius: 6px !important;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.6) !important;
+}
+
+#app .match-rules {
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  padding-top: 18px !important;
+}
+
+#app .match-rules > div {
+  border-left: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+#app .match-rules dt {
+  font-family: var(--font-tech) !important;
+  font-size: 10px !important;
+  letter-spacing: 0.08em !important;
+  color: #7b93af !important;
+  text-transform: uppercase !important;
+}
+
+#app .match-rules dd {
+  font-family: var(--font-esport) !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: #fff !important;
+}
+
+#app .match-panel__footer {
+  background: rgba(5, 10, 20, 0.95) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+  padding: 18px 24px !important;
+}
+
+#app .match-action {
+  border-radius: 10px !important;
+  font-family: var(--font-esport) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  min-height: 52px !important;
+  transition: all 0.18s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+}
+
+#app .match-action--primary {
+  background: linear-gradient(135deg, #ff8c00 0%, #ff5500 100%) !important;
+  border: 1px solid rgba(255, 140, 0, 0.6) !important;
+  color: #fff !important;
+  box-shadow: 0 0 25px rgba(255, 120, 0, 0.4) !important;
+}
+
+#app .match-action--primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #ffa32b 0%, #ff6e26 100%) !important;
+  box-shadow: 0 0 35px rgba(255, 120, 0, 0.65) !important;
+  transform: translateY(-2px) !important;
+}
+
+#app .match-action--quiet {
+  color: #7b93af !important;
+  font-family: var(--font-tech) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+}
+
+#app .match-action--quiet:hover:not(:disabled) {
+  color: #00f0ff !important;
+}
+
+#app .match-panel__shortcut {
+  font-family: var(--font-tech) !important;
+  color: #647b99 !important;
+  font-size: 11px !important;
+}
+
+#app .match-panel__shortcut kbd {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: 4px !important;
+  color: #00f0ff !important;
+  font-family: var(--font-mono) !important;
+}
+
+#app .match-panel__credit {
+  font-family: var(--font-tech) !important;
+  color: #4f6480 !important;
+  font-size: 10px !important;
+}
+
+/* ==========================================================================
+   GOAL & SHOT NOTIFICATION BANNER
+   ========================================================================== */
+#rl-goal-banner {
+  position: fixed;
+  top: 25%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+  z-index: 200;
+  opacity: 0;
+  transition: all 0.4s var(--ease-spring);
+}
+
+#rl-goal-banner.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.goal-title {
+  font-family: var(--font-display);
+  font-size: 84px;
+  font-weight: 700;
+  font-style: italic;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-shadow:
+    0 0 24px var(--orange-glow),
+    0 0 60px var(--orange-boost);
+  margin: 0;
+  line-height: 1;
+}
+
+.goal-speed {
+  font-family: var(--font-esport);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--gold-speed);
+  letter-spacing: 0.06em;
+  text-shadow: 0 0 16px var(--gold-glow);
+  margin-top: 8px;
+}
+
+/* Toast Notification */
+#rl-toast {
+  position: fixed;
+  bottom: 84px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  padding: 10px 22px;
+  background: rgba(10, 15, 28, 0.92);
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  border-radius: 999px;
+  backdrop-filter: blur(20px);
+  color: #fff;
+  font-family: var(--font-esport);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 16px rgba(0, 240, 255, 0.2);
+  pointer-events: none;
+  z-index: 150;
+  opacity: 0;
+  transition: all 0.25s var(--ease-spring);
+}
+
+#rl-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Keyframes */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.75); }
+}
+
+@keyframes float-emblem {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-8px); }
+}
+
+@keyframes glow-pulse {
+  0% { opacity: 0.6; transform: translate(-50%, -50%) scale(0.9); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+}
+
+@keyframes load-beam {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
