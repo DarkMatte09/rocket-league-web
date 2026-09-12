@@ -12,20 +12,35 @@
         const path = window.location.pathname;
         const base = path.endsWith('/') ? path : path.substring(0, path.lastIndexOf('/') + 1);
         if (base && base !== '/') {
+          const origin = window.location.origin;
+          const originAssets = origin + '/assets/';
+          const correctedAssets = origin + base + 'assets/';
+
           const origFetch = window.fetch;
           window.fetch = function(input, init) {
-            if (typeof input === 'string' && input.startsWith('/assets/')) {
-              input = base + input.slice(1);
+            if (typeof input === 'string') {
+              if (input.startsWith(originAssets)) {
+                input = correctedAssets + input.slice(originAssets.length);
+              } else if (input.startsWith('/assets/')) {
+                input = base + input.slice(1);
+              }
+            } else if (input instanceof Request && input.url && input.url.startsWith(originAssets)) {
+              const newUrl = correctedAssets + input.url.slice(originAssets.length);
+              input = new Request(newUrl, input);
             }
             return origFetch.call(this, input, init);
           };
 
           const OrigWorker = window.Worker;
           window.Worker = function(scriptURL, options) {
-            if (typeof scriptURL === 'string' && scriptURL.startsWith('/assets/')) {
-              scriptURL = base + scriptURL.slice(1);
-            } else if (scriptURL instanceof URL && scriptURL.pathname.startsWith('/assets/')) {
-              scriptURL = new URL(base + scriptURL.pathname.slice(1), window.location.origin);
+            if (typeof scriptURL === 'string') {
+              if (scriptURL.startsWith(originAssets)) {
+                scriptURL = correctedAssets + scriptURL.slice(originAssets.length);
+              } else if (scriptURL.startsWith('/assets/')) {
+                scriptURL = base + scriptURL.slice(1);
+              }
+            } else if (scriptURL instanceof URL && scriptURL.href.startsWith(originAssets)) {
+              scriptURL = new URL(correctedAssets + scriptURL.href.slice(originAssets.length));
             }
             return new OrigWorker(scriptURL, options);
           };
@@ -33,12 +48,22 @@
           if (window.AudioContext && window.AudioWorklet && AudioWorklet.prototype.addModule) {
             const origAddModule = AudioWorklet.prototype.addModule;
             AudioWorklet.prototype.addModule = function(moduleURL, options) {
-              if (typeof moduleURL === 'string' && moduleURL.startsWith('/assets/')) {
-                moduleURL = base + moduleURL.slice(1);
+              if (typeof moduleURL === 'string') {
+                if (moduleURL.startsWith(originAssets)) {
+                  moduleURL = correctedAssets + moduleURL.slice(originAssets.length);
+                } else if (moduleURL.startsWith('/assets/')) {
+                  moduleURL = base + moduleURL.slice(1);
+                }
               }
               return origAddModule.call(this, moduleURL, options);
             };
           }
+
+          window.addEventListener('error', function(e) {
+            if (e.target && e.target.tagName === 'IMG' && e.target.src && e.target.src.startsWith(originAssets)) {
+              e.target.src = correctedAssets + e.target.src.slice(originAssets.length);
+            }
+          }, true);
         }
       })();
     </script>
