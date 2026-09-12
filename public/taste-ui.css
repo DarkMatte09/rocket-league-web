@@ -1835,6 +1835,421 @@ body:has(.match-overlay.is-open) #rl-hud-controls {
   100% { transform: translateX(200%); }
 }
 
+
+/* ==========================================================================
+   Bot Rank Selector & Skill Tiers UI
+   ========================================================================== */
+.bot-rank-selector {
+  margin-top: 18px;
+  margin-bottom: 20px;
+}
+
+.rank-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.rank-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  background: var(--rank-bg, rgba(20, 30, 50, 0.4));
+  border: 1px solid var(--rank-border, rgba(255, 255, 255, 0.15));
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+  user-select: none;
+}
+
+.rank-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--rank-color);
+  box-shadow: 0 4px 14px var(--rank-glow, rgba(0, 240, 255, 0.2));
+}
+
+.rank-card.is-selected {
+  border-color: var(--rank-color) !important;
+  background: color-mix(in srgb, var(--rank-bg) 70%, #0c1830) !important;
+  box-shadow: 0 0 16px var(--rank-glow) !important;
+}
+
+.rank-card__icon {
+  font-size: 20px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.rank-card__info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.rank-card__name {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--rank-color, #fff);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+}
+
+.rank-card__sub {
+  font-family: var(--font-sans);
+  font-size: 9px;
+  color: rgba(220, 235, 255, 0.7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rank-card__radio {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid var(--rank-color);
+  flex-shrink: 0;
+}
+
+.rank-card.is-selected .rank-card__radio {
+  background: var(--rank-color);
+  box-shadow: 0 0 8px var(--rank-color);
+}
+
+/* ==========================================================================
+   Online Private Multiplayer Lobby UI
+   ========================================================================== */
+.multiplayer-lobby-panel {
+  margin-bottom: 20px;
+}
+
+.match-mode-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.match-mode-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(10, 18, 36, 0.6);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  border-radius: 8px;
+  color: #c0d8f0;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.match-mode-tab:hover {
+  background: rgba(0, 240, 255, 0.1);
+  border-color: rgba(0, 240, 255, 0.4);
+  color: #fff;
+}
+
+.match-mode-tab.is-active {
+  background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(0, 110, 255, 0.25));
+  border-color: #00f0ff;
+  color: #fff;
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.3);
+}
+
+.mp-card {
+  padding: 18px;
+  background: rgba(8, 14, 28, 0.75);
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.mp-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-family: var(--font-display);
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  color: #fff;
+}
+
+.mp-badge-p2p {
+  padding: 2px 8px;
+  background: rgba(0, 255, 170, 0.15);
+  border: 1px solid #00ffaa;
+  border-radius: 4px;
+  color: #00ffaa;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.mp-hint {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 1.5;
+  color: #a0c0e0;
+  margin-bottom: 16px;
+}
+
+.mp-actions-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.mp-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+.mp-btn--primary {
+  background: linear-gradient(135deg, #00f0ff, #0088ff);
+  border: 1px solid #80f8ff;
+  color: #040814;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+}
+
+.mp-btn--primary:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+  box-shadow: 0 0 28px rgba(0, 240, 255, 0.6);
+}
+
+.mp-join-wrap {
+  display: flex;
+  gap: 8px;
+}
+
+.mp-input {
+  flex: 1;
+  min-height: 44px;
+  padding: 8px 14px;
+  background: rgba(12, 20, 40, 0.8);
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  border-radius: 8px;
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.mp-input:focus {
+  border-color: #00f0ff;
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.4);
+}
+
+.mp-btn--secondary {
+  flex: 0 0 110px;
+  background: rgba(20, 36, 68, 0.8);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  color: #fff;
+}
+
+.mp-btn--secondary:hover {
+  background: rgba(30, 54, 100, 0.9);
+  border-color: #00f0ff;
+}
+
+/* Room Created Banner */
+.mp-room-badge {
+  padding: 16px;
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid rgba(0, 240, 255, 0.45);
+  border-radius: 8px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.mp-room-title {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #70d0ff;
+}
+
+.mp-room-code {
+  font-family: var(--font-mono);
+  font-size: 34px;
+  font-weight: 700;
+  color: #00f0ff;
+  letter-spacing: 0.12em;
+  margin: 6px 0 12px;
+  text-shadow: 0 0 20px rgba(0, 240, 255, 0.6);
+}
+
+.mp-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: rgba(0, 240, 255, 0.2);
+  border: 1px solid #00f0ff;
+  border-radius: 6px;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mp-copy-btn:hover {
+  background: #00f0ff;
+  color: #040814;
+}
+
+.mp-waiting-pulse {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: #90c0e0;
+}
+
+.radar-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #00f0ff;
+  animation: radar-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes radar-pulse {
+  0% { transform: scale(0.8); opacity: 0.5; box-shadow: 0 0 0 0 rgba(0, 240, 255, 0.7); }
+  70% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 0 8px rgba(0, 240, 255, 0); }
+  100% { transform: scale(0.8); opacity: 0.5; box-shadow: 0 0 0 0 rgba(0, 240, 255, 0); }
+}
+
+.mp-quick-chat-hints {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: #8bb0d0;
+}
+
+.chat-hint-key kbd {
+  padding: 1px 5px;
+  background: rgba(0, 240, 255, 0.2);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  border-radius: 3px;
+  color: #00f0ff;
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+
+/* Multiplayer In-Game Toast & Quick Chat */
+.multiplayer-toast {
+  position: fixed;
+  top: max(24px, env(safe-area-inset-top, 24px));
+  left: 50%;
+  transform: translateX(-50%) translateY(-30px);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 150;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 24px;
+  background: rgba(8, 14, 28, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 240, 255, 0.5);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 24px rgba(0, 240, 255, 0.3);
+  transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.2), opacity 0.2s ease;
+}
+
+.multiplayer-toast.is-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.multiplayer-toast .toast-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 12px rgba(0, 240, 255, 0.5);
+}
+
+.multiplayer-toast .toast-sub {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: #8bc0f0;
+  margin-top: 2px;
+}
+
+/* Ping Indicator */
+.ping-indicator {
+  position: fixed;
+  top: max(16px, env(safe-area-inset-top, 16px));
+  left: calc(max(16px, env(safe-area-inset-left, 16px)) + 260px);
+  z-index: 45;
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  background: rgba(8, 14, 28, 0.7);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: #c0e0ff;
+  letter-spacing: 0.05em;
+  pointer-events: none;
+}
+
+.ping-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {
     animation-duration: 0.01ms !important;
